@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image";
+
 // Data untuk fitur agar mudah dikelola
 const features = [
   {
@@ -25,7 +27,7 @@ const features = [
   },
 ];
 
-const technologies = ["Next.js", "React", "Tailwind CSS", "TypeScript", "Framer Motion", "Machine Learning"];
+const technologies = ["Next.js", "React", "Tailwind CSS", "TypeScript", "Framer Motion", "Deep Learning"];
 
 export default function AboutPage() {
   return (
@@ -33,11 +35,18 @@ export default function AboutPage() {
       <section className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-xl p-8">
         {/* Header Halaman */}
         <div className="text-center">
-            <div className="mx-auto w-16 h-16 mb-4 flex items-center justify-center bg-gradient-to-br from-emerald-500 to-green-600 rounded-full shadow-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="16" y2="12"/><line x1="12" x2="12.01" y1="8" y2="8"/></svg>
+            <div className="mx-auto w-16 h-16 mb-4 flex items-center justify-center">
+                <Image
+                  src="/chili_about.png"
+                  alt="Chili Green Icon"
+                  width={200}
+                  height={200}
+                  className="w-52 h-52 object-contain"
+                  priority
+                />
             </div>
             <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Tentang Aplikasi</h1>
-            <p className="text-slate-500 mt-2 max-w-2xl mx-auto">Informasi mengenai tujuan, fitur, dan teknologi di balik Chili Identifier.</p>
+            <p className="text-slate-500 mt-2 max-w-2xl mx-auto">Informasi mengenai tujuan, fitur, dan teknologi di balik Chili Classifier.</p>
         </div>
 
         <hr className="my-8 border-slate-200" />
@@ -49,7 +58,9 @@ export default function AboutPage() {
           <div>
             <h2 className="text-2xl font-bold text-slate-700 mb-3">Tujuan Aplikasi</h2>
             <p className="text-slate-600 leading-relaxed">
-              <b>Chili Identifier</b> adalah sebuah proyek pembuktian konsep (*proof-of-concept*) yang dirancang untuk membantu pengguna, mulai dari petani hingga konsumen, dalam mengidentifikasi berbagai jenis cabai secara mudah dan cepat. Dengan memanfaatkan kekuatan kecerdasan buatan (*Artificial Intelligence*), aplikasi ini bertujuan untuk memberikan informasi yang akurat hanya melalui sebuah gambar, menjembatani kesenjangan informasi di dunia agrikultur.
+              Pernahkah Anda berdiri di pasar, bingung membedakan cabai rawit dan cabai setan? Atau seorang petani yang ingin memastikan jenis cabai yang ditanam sudah sesuai? Di dunia agrikultur yang kaya, informasi seringkali menjadi jurang pemisah.<br /><br />
+              <b>Chili Classifier</b> hadir untuk menjembatani jurang tersebut. Kami percaya bahwa teknologi canggih seperti Kecerdasan Buatan (Artificial Intelligence) harus bisa diakses oleh semua orang, dari petani di ladang hingga koki di dapur.<br /><br />
+              Hanya dengan satu foto, aplikasi kami memberikan kepastian instan. Sistem cerdas kami akan langsung mengenali apakah gambar di hadapan Anda adalah cabai atau bukan. Jika ya, aplikasi akan menampilkan nama jenis cabainya, lengkap dengan persentase akurasi untuk menunjukkan seberapa yakin sistem kami dengan hasilnya. Ini adalah bukti nyata bahwa teknologi dapat menyederhanakan pengetahuan kita tentang hasil bumi.
             </p>
           </div>
 
