@@ -104,5 +104,19 @@ def get_history():
     conn.close()
     return jsonify(rows), 200
 
+# Endpoint DELETE: Hapus history berdasarkan id
+@app.route('/history/<int:id>', methods=['DELETE'])
+def delete_history(id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM history WHERE id = %s", (id,))
+    conn.commit()
+    affected = cursor.rowcount
+    cursor.close()
+    conn.close()
+    if affected == 0:
+        return jsonify({'error': 'Data tidak ditemukan'}), 404
+    return jsonify({'message': 'History berhasil dihapus'}), 200
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000) 

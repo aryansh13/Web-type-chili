@@ -21,6 +21,7 @@ const ImageFallback = ({ src, alt, ...props }: any) => {
 export default function HistoryPage() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | number | null>(null);
 
   useEffect(() => {
     async function fetchHistory() {
@@ -36,6 +37,25 @@ export default function HistoryPage() {
     }
     fetchHistory();
   }, []);
+
+  async function handleDelete(id: string | number) {
+    if (!window.confirm("Yakin ingin menghapus riwayat ini?")) return;
+    setDeletingId(id);
+    try {
+      const res = await fetch(`http://localhost:5000/history/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Gagal menghapus data");
+      }
+      setHistory((prev) => prev.filter((item) => item.id !== id));
+    } catch (err: any) {
+      alert(err.message || "Terjadi kesalahan saat menghapus data");
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   if (loading) {
     return (
@@ -83,20 +103,24 @@ export default function HistoryPage() {
         <div className="overflow-x-auto">
           <div className="inline-block min-w-full align-middle">
             {/* Header Tabel */}
-            <div className="hidden sm:grid grid-cols-3 md:grid-cols-[2fr,1fr,1fr] gap-4 border-b border-slate-200 pb-3 mb-3 text-left text-sm font-semibold text-slate-500">
-              <div className="pl-4">Nama Cabai</div>
-              <div className="text-center">Akurasi</div>
+            <div className="hidden sm:grid grid-cols-5 gap-4 border-b border-slate-200 pb-3 mb-3 text-left text-sm font-semibold text-slate-500">
+              <div className="pl-4">ID</div>
+              <div className="text-center">Foto</div>
+              <div className="text-center">Hasil</div>
               <div className="text-center">Tanggal</div>
+              <div className="text-center">Aksi</div>
             </div>
             {/* Isi Tabel */}
             <div className="flex flex-col gap-2">
               {history.map((item) => (
                 <div
                   key={item.id}
-                  className="flex flex-col sm:grid sm:grid-cols-3 md:grid-cols-[2fr,1fr,1fr] items-start sm:items-center gap-2 sm:gap-4 bg-slate-50 hover:bg-slate-100 rounded-lg p-2 transition-colors"
+                  className="flex flex-col sm:grid sm:grid-cols-5 items-start sm:items-center gap-2 sm:gap-4 bg-slate-50 hover:bg-slate-100 rounded-lg p-2 transition-colors"
                 >
-                  {/* Kolom Nama & Gambar */}
-                  <div className="flex items-center gap-4 w-full">
+                  {/* Kolom ID */}
+                  <div className="w-full pl-4 text-slate-700 font-mono text-xs sm:text-sm">{item.id}</div>
+                  {/* Kolom Foto */}
+                  <div className="flex justify-center w-full">
                     <ImageFallback
                       src={item.image}
                       alt={item.name}
@@ -104,16 +128,23 @@ export default function HistoryPage() {
                       height={64}
                       className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-md border-2 border-white shadow-sm"
                     />
-                    <span className="font-semibold text-slate-700 text-base sm:text-lg">{item.name}</span>
                   </div>
-                  {/* Kolom Akurasi */}
-                  <div className="flex justify-start sm:justify-center w-full">
-                    <span className="bg-emerald-100 text-emerald-700 text-sm font-bold px-3 py-1 rounded-full">
-                      {item.accuracy}%
-                    </span>
+                  {/* Kolom Hasil (Nama & Akurasi) */}
+                  <div className="flex flex-col items-start sm:items-center w-full">
+                    <span className="font-semibold text-slate-700 text-base sm:text-lg">{item.name} <span className="text-emerald-700 font-bold">{item.accuracy}%</span></span>
                   </div>
                   {/* Kolom Tanggal */}
                   <div className="text-sm text-slate-500 text-left sm:text-center w-full">{formatDate(item.date)}</div>
+                  {/* Kolom Aksi (Hapus) */}
+                  <div className="flex justify-center w-full">
+                    <button
+                      className="bg-red-100 text-red-600 hover:bg-red-200 font-semibold px-3 py-1 rounded-lg text-xs sm:text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                      onClick={() => handleDelete(item.id)}
+                      disabled={deletingId === item.id}
+                    >
+                      {deletingId === item.id ? "Menghapus..." : "Hapus"}
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
