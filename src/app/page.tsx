@@ -22,6 +22,11 @@ export default function HomePage() {
   const [result, setResult] = useState<typeof DUMMY_RESULT | null>(null);
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Kamera
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const [capturing, setCapturing] = useState(false);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -113,6 +118,54 @@ export default function HomePage() {
     }
   };
 
+  // Kamera: buka modal dan mulai stream
+  const openCamera = async () => {
+    setCameraError(null);
+    setShowCamera(true);
+    setTimeout(async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          videoRef.current.play();
+        }
+      } catch (err) {
+        setCameraError("Tidak dapat mengakses kamera. Pastikan izin kamera sudah diberikan.");
+      }
+    }, 100);
+  };
+
+  // Kamera: capture gambar dari video
+  const handleCapture = () => {
+    if (!videoRef.current) return;
+    setCapturing(true);
+    const video = videoRef.current;
+    const canvas = document.createElement("canvas");
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL("image/jpeg");
+      setImage(dataUrl);
+      setResult(null);
+    }
+    // Stop kamera
+    if (video.srcObject) {
+      (video.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
+    }
+    setShowCamera(false);
+    setCapturing(false);
+  };
+
+  // Kamera: tutup modal dan stop kamera
+  const closeCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      (videoRef.current.srcObject as MediaStream).getTracks().forEach((track) => track.stop());
+    }
+    setShowCamera(false);
+  };
+
   return (
     // Wrapper ini untuk memusatkan kartu di tengah halaman
     <div className="p-2 sm:p-4 lg:p-8">
@@ -156,6 +209,35 @@ export default function HomePage() {
               <span className="text-slate-700 font-semibold text-center">{image ? "Ganti Gambar Lain" : "Klik untuk Unggah Gambar"}</span>
               <span className="text-xs text-slate-400 mt-1">PNG, JPG, WEBP (maks. 5MB)</span>
             </div>
+            <button
+              type="button"
+              onClick={openCamera}
+              className="w-full py-2.5 text-base font-bold rounded-xl bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow hover:from-emerald-500 hover:to-green-600 transition-all duration-300 flex items-center justify-center gap-2"
+            >
+              <svg width="22" height="22" fill="none" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.5"/><path d="M8 7V5a4 4 0 0 1 8 0v2" stroke="currentColor" strokeWidth="1.5"/><circle cx="12" cy="13.5" r="3" stroke="currentColor" strokeWidth="1.5"/></svg>
+              Ambil dari Kamera
+            </button>
+            {/* Modal Kamera */}
+            {showCamera && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                <div className="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center relative flex flex-col items-center">
+                  <button onClick={closeCamera} className="absolute top-3 right-3 text-slate-400 hover:text-red-500 text-xl font-bold">&times;</button>
+                  <h3 className="text-lg font-bold text-slate-800 mb-2">Ambil Gambar dari Kamera</h3>
+                  {cameraError ? (
+                    <div className="text-red-500 mb-4">{cameraError}</div>
+                  ) : (
+                    <video ref={videoRef} className="rounded-lg border border-slate-200 mb-4 w-full max-h-64 bg-black" autoPlay playsInline />
+                  )}
+                  <button
+                    onClick={handleCapture}
+                    disabled={capturing || !!cameraError}
+                    className="mt-2 px-6 py-2 rounded-lg bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-colors disabled:opacity-60"
+                  >
+                    {capturing ? "Mengambil..." : "Capture"}
+                  </button>
+                </div>
+              </div>
+            )}
             <button
               onClick={handleIdentify}
               disabled={!image || loading}
