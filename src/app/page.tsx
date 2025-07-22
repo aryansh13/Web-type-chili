@@ -41,11 +41,32 @@ export default function HomePage() {
   };
 
   const handleIdentify = async () => {
-    if (!image || !inputRef.current?.files?.[0]) return;
+    if (!image) return;
     setLoading(true);
 
+    let fileToSend: File | null = null;
+    if (inputRef.current && inputRef.current.files && inputRef.current.files[0]) {
+      fileToSend = inputRef.current.files[0];
+    } else if (image.startsWith("data:")) {
+      // Konversi dataURL ke File
+      const arr = image.split(",");
+      const match = arr[0].match(/:(.*?);/);
+      const mime = match ? match[1] : "image/jpeg";
+      const bstr = atob(arr[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      fileToSend = new File([u8arr], "capture.jpg", { type: mime });
+    }
+    if (!fileToSend) {
+      setLoading(false);
+      return;
+    }
+
     const formData = new FormData();
-    formData.append('file', inputRef.current.files[0]);
+    formData.append('file', fileToSend);
 
     try {
       const response = await fetch('http://127.0.0.1:5000/predict', {
@@ -92,7 +113,7 @@ export default function HomePage() {
 
       // Kirim ke endpoint /history agar tersimpan di database
       const saveForm = new FormData();
-      saveForm.append('image', inputRef.current.files[0]);
+      saveForm.append('image', fileToSend);
       saveForm.append('name', resultObj.name);
       saveForm.append('accuracy', resultObj.accuracy.toString());
       // Format date ke YYYY-MM-DD HH:mm:ss
