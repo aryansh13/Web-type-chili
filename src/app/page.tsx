@@ -238,6 +238,59 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      {/* Bagian Cara Penggunaan & Jenis Cabai */}
+      <div className="max-w-5xl w-full mx-auto mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Cara Penggunaan Modern */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-6">
+          <h2 className="text-xl font-bold text-emerald-700 flex items-center gap-2 mb-2">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2"/></svg>
+            Cara Mengklasifikasi Cabai
+          </h2>
+          <div className="relative pl-6">
+            {/* Stepper garis vertikal */}
+            <div className="absolute left-3 top-6 bottom-0 w-0.5 bg-emerald-100" style={{zIndex:0}} />
+            {/* Langkah-langkah */}
+            {[
+              { label: "Siapkan foto cabai yang ingin Anda identifikasi." },
+              { label: "Klik area unggah gambar, lalu pilih foto cabai dari perangkat Anda." },
+              { label: <>Tekan tombol <span className="font-semibold text-emerald-600">Klasifikasi Sekarang</span>.</> },
+              { label: "Tunggu beberapa detik hingga hasil prediksi muncul di sebelah kanan." },
+              { label: "Hasil identifikasi dan akurasi akan langsung tampil, serta otomatis tersimpan di riwayat." },
+            ].map((step, idx, arr) => (
+              <div key={idx} className="flex items-start gap-4 relative z-10 mb-2 last:mb-0">
+                <div className={`flex items-center justify-center w-8 h-8 rounded-full border-2 ${idx === 0 ? 'border-emerald-500 bg-emerald-50' : 'border-emerald-200 bg-white'} text-emerald-600 font-bold text-lg shadow-sm`}>{idx+1}</div>
+                <div className="flex-1 bg-emerald-50 rounded-xl px-4 py-3 text-slate-700 shadow-sm border border-emerald-100">
+                  {step.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Jenis Cabai Modern */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-4">
+          <h2 className="text-xl font-bold text-emerald-700 flex items-center gap-2 mb-2">
+            <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+            Jenis Cabai yang Bisa Dikenali
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[
+              { name: "Cabai Rawit Merah", bg: "bg-gradient-to-r from-red-100 to-red-50", icon: "#e11d48" },
+              { name: "Cabai Rawit Hijau", bg: "bg-gradient-to-r from-green-100 to-green-50", icon: "#22c55e" },
+              { name: "Cabai Keriting Merah", bg: "bg-gradient-to-r from-pink-100 to-pink-50", icon: "#f43f5e" },
+              { name: "Cabai Keriting Hijau", bg: "bg-gradient-to-r from-lime-100 to-lime-50", icon: "#84cc16" },
+              { name: "Cabai Besar Merah", bg: "bg-gradient-to-r from-orange-100 to-orange-50", icon: "#fb7185" },
+              { name: "Cabai Besar Hijau", bg: "bg-gradient-to-r from-emerald-100 to-emerald-50", icon: "#10b981" },
+            ].map((c, idx) => (
+              <div key={idx} className={`flex items-center gap-4 rounded-xl p-4 shadow-sm border border-slate-100 ${c.bg}`}>
+                <span className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow border border-slate-200">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none"><path d="M7 17c-1.5-2.5-2-6.5 2-9 2.5-1.5 6.5-1.5 8 2 1.5 3.5-1.5 7-5 7" stroke={c.icon} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/><circle cx="12" cy="12" r="11" stroke="#e5e7eb" strokeWidth="1.2" fill="none"/></svg>
+                </span>
+                <span className="font-semibold text-slate-800 text-base">{c.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
