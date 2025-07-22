@@ -22,6 +22,7 @@ export default function HistoryPage() {
   const [history, setHistory] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | number | null>(null);
+  const [confirmId, setConfirmId] = useState<string | number | null>(null);
 
   useEffect(() => {
     async function fetchHistory() {
@@ -39,7 +40,6 @@ export default function HistoryPage() {
   }, []);
 
   async function handleDelete(id: string | number) {
-    if (!window.confirm("Yakin ingin menghapus riwayat ini?")) return;
     setDeletingId(id);
     try {
       const res = await fetch(`http://localhost:5000/history/${id}`, {
@@ -54,6 +54,7 @@ export default function HistoryPage() {
       alert(err.message || "Terjadi kesalahan saat menghapus data");
     } finally {
       setDeletingId(null);
+      setConfirmId(null);
     }
   }
 
@@ -94,9 +95,6 @@ export default function HistoryPage() {
                 <h1 className="text-3xl font-bold text-slate-800 tracking-tight">Riwayat Identifikasi</h1>
                 <p className="text-slate-500 mt-1">Berikut adalah daftar semua identifikasi yang telah Anda lakukan.</p>
             </div>
-            <button className="flex-shrink-0 bg-slate-100 text-slate-600 hover:bg-slate-200 font-semibold px-4 py-2 rounded-lg transition-colors text-sm">
-                Hapus Semua Riwayat
-            </button>
         </div>
 
         {/* Daftar Riwayat dalam Bentuk Tabel */}
@@ -112,13 +110,13 @@ export default function HistoryPage() {
             </div>
             {/* Isi Tabel */}
             <div className="flex flex-col gap-2">
-              {history.map((item) => (
+              {history.map((item, idx) => (
                 <div
                   key={item.id}
                   className="flex flex-col sm:grid sm:grid-cols-5 items-start sm:items-center gap-2 sm:gap-4 bg-slate-50 hover:bg-slate-100 rounded-lg p-2 transition-colors"
                 >
-                  {/* Kolom ID */}
-                  <div className="w-full pl-4 text-slate-700 font-mono text-xs sm:text-sm">{item.id}</div>
+                  {/* Kolom ID (Nomor Urut) */}
+                  <div className="w-full pl-4 text-slate-700 font-mono text-xs sm:text-sm">{idx + 1}</div>
                   {/* Kolom Foto */}
                   <div className="flex justify-center w-full">
                     <ImageFallback
@@ -139,7 +137,7 @@ export default function HistoryPage() {
                   <div className="flex justify-center w-full">
                     <button
                       className="bg-red-100 text-red-600 hover:bg-red-200 font-semibold px-3 py-1 rounded-lg text-xs sm:text-sm transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                      onClick={() => handleDelete(item.id)}
+                      onClick={() => setConfirmId(item.id)}
                       disabled={deletingId === item.id}
                     >
                       {deletingId === item.id ? "Menghapus..." : "Hapus"}
@@ -152,6 +150,32 @@ export default function HistoryPage() {
         </div>
 
       </section>
+      {/* Modal Konfirmasi Hapus */}
+      {confirmId !== null && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-xl shadow-2xl p-8 max-w-sm w-full text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="mx-auto mb-4 text-red-400"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">Konfirmasi Hapus</h3>
+            <p className="text-slate-600 mb-6">Apakah Anda yakin ingin menghapus riwayat ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div className="flex justify-center gap-4">
+              <button
+                className="px-5 py-2 rounded-lg bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200 transition-colors"
+                onClick={() => setConfirmId(null)}
+                disabled={deletingId === confirmId}
+              >
+                Batal
+              </button>
+              <button
+                className="px-5 py-2 rounded-lg bg-red-500 text-white font-bold hover:bg-red-600 transition-colors disabled:opacity-60"
+                onClick={() => handleDelete(confirmId)}
+                disabled={deletingId === confirmId}
+              >
+                {deletingId === confirmId ? "Menghapus..." : "Hapus"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
